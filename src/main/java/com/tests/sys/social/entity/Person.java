@@ -1,6 +1,7 @@
 package com.tests.sys.social.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -8,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
+import java.util.Set;
 
 /**
  * Идентификатор
@@ -24,6 +27,7 @@ import javax.persistence.Id;
 @Entity
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Person {
 
     @Id
@@ -35,7 +39,6 @@ public class Person {
     private String middleName;
     private String dayOfBirth;
 
-//    @OneToMany
-//    @JoinColumn(name = "friend_id")
-//    private Set<Person> friends;
+    //@Transient
+    //private Set<Person> friends;
 }

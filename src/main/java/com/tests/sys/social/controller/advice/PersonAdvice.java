@@ -1,4 +1,4 @@
-package com.tests.sys.social.controllers.advice;
+package com.tests.sys.social.controller.advice;
 
 
 import com.tests.sys.social.exception.PersonNotFoundException;

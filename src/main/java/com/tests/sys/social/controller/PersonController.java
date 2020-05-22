@@ -1,4 +1,4 @@
-package com.tests.sys.social.controllers;
+package com.tests.sys.social.controller;
 
 import com.tests.sys.social.entity.Person;
 import com.tests.sys.social.exception.PersonNotFoundException;
@@ -20,12 +20,14 @@ import java.util.List;
 @RequestMapping("persons")
 public class PersonController {
 
-    @Autowired
     private PersonRepository personRepository;
-
-    @Autowired
     private RelationshipRepository relationshipRepository;
 
+    @Autowired
+    public PersonController(PersonRepository personRepository, RelationshipRepository relationshipRepository) {
+        this.personRepository = personRepository;
+        this.relationshipRepository = relationshipRepository;
+    }
 
     @GetMapping
     public List<Person> getPersons() {
