@@ -65,6 +65,20 @@ class PersonControllerIntegrationTest {
     }
 
     @Test
+    public void createNewPersonFailed() {
+        Person person = Person.builder()
+                .firstName(Const.PERSON_NAME)
+                .middleName(Const.PERSON_MIDDLE_NAME)
+                .lastName(Const.PERSON_SURNAME)
+                .dayOfBirth("23-07-1990")
+                .build();
+        ResponseEntity<String> response = restTemplate.postForEntity(URL, person, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Invalid date format: 23-07-1990. Accepted format: yyyy-MM-dd", response.getBody());
+    }
+
+    @Test
     public void createNewPersonSuccess() {
 
         ResponseEntity<Person> response = restTemplate.postForEntity(URL, person, Person.class);

@@ -1,9 +1,13 @@
 package com.tests.sys.social.controller;
 
+import com.tests.sys.social.Validator;
 import com.tests.sys.social.entity.Person;
+import com.tests.sys.social.exception.DateFormatException;
 import com.tests.sys.social.exception.PersonNotFoundException;
 import com.tests.sys.social.repository.PersonRepository;
 import com.tests.sys.social.repository.RelationshipRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static com.tests.sys.social.Const.DATE_FORMAT;
+
 @RestController
+@Slf4j
 @RequestMapping("persons")
 public class PersonController {
 
@@ -45,7 +54,13 @@ public class PersonController {
     }
 
     @PostMapping
-    public Person createPerson(@RequestBody Person person) {
+    public Person createPerson(@RequestBody Person person) throws DateFormatException{
+        String dateOfBirth = person.getDayOfBirth();
+
+        if(Validator.isValidDateFormat(dateOfBirth)) {
+            throw new DateFormatException(dateOfBirth);
+        }
+
         return personRepository.save(person);
     }
 
@@ -58,7 +73,29 @@ public class PersonController {
     public Person updatePerson(@RequestBody Person newPerson, @PathVariable Long id) {
         return personRepository.findById(id)
                 .map(person -> {
-                    person.setFirstName(newPerson.getFirstName());
+
+                    if(StringUtils.isNotEmpty(newPerson.getFirstName())) {
+                        person.setFirstName(newPerson.getFirstName());
+                    }
+
+                    if(StringUtils.isNotEmpty(newPerson.getLastName())) {
+                        person.setLastName(newPerson.getLastName());
+                    }
+
+                    if(StringUtils.isNotEmpty(newPerson.getMiddleName())) {
+                        person.setMiddleName(newPerson.getMiddleName());
+                    }
+
+
+                    if(StringUtils.isNotEmpty(newPerson.getDayOfBirth())) {
+                        String dateOfBirth = newPerson.getDayOfBirth();
+
+                        if (Validator.isValidDateFormat(dateOfBirth)) {
+                            throw new DateFormatException(dateOfBirth);
+                        }
+
+                        person.setDayOfBirth(dateOfBirth);
+                    }
                     return personRepository.save(person);
                 }).orElseGet(() -> {
                     newPerson.setId(id);
