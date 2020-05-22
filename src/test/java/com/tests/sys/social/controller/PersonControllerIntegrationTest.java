@@ -27,6 +27,8 @@ class PersonControllerIntegrationTest {
 
     private static final String URL = "/persons";
 
+    private static final String ID_UPDATE = "1";
+
     private Person person = Person.builder()
             .firstName(Const.PERSON_NAME)
             .middleName(Const.PERSON_MIDDLE_NAME)
@@ -49,7 +51,7 @@ class PersonControllerIntegrationTest {
 
     @Test
     public void getPersonSuccess() {
-        ResponseEntity<Person> response = restTemplate.getForEntity(URL + "/1", Person.class);
+        ResponseEntity<Person> response = restTemplate.getForEntity(URL + "/" + ID_UPDATE, Person.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
     }
@@ -74,10 +76,18 @@ class PersonControllerIntegrationTest {
     @Test
     public void updatePersonSuccess() {
         Person updateData = Person.builder().firstName(Const.PERSON_NAME).build();
-        restTemplate.put(URL + "/1", updateData, Person.class);
+        restTemplate.put(URL + "/" + ID_UPDATE, updateData, Person.class);
 
-        ResponseEntity<Person> response = restTemplate.getForEntity(URL + "/1", Person.class);
+        ResponseEntity<Person> response = restTemplate.getForEntity(URL + "/" + ID_UPDATE, Person.class);
         assertNotNull(response.getBody());
         assertEquals(Const.PERSON_NAME, response.getBody().getFirstName());
+    }
+
+    @Test
+    public void successDeletePersonWithoutRelationship() {
+        restTemplate.delete(URL + "/3");
+
+        ResponseEntity<?> response = restTemplate.getForEntity(URL + "/3", String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
