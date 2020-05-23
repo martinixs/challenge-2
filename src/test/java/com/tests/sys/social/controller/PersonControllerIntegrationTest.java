@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +35,7 @@ class PersonControllerIntegrationTest {
             .firstName(Const.PERSON_NAME)
             .middleName(Const.PERSON_MIDDLE_NAME)
             .lastName(Const.PERSON_SURNAME)
-            .dayOfBirth(Const.PERSON_DATE_OF_BIRTH)
+            .dateOfBirth(new Date())
             .build();
 
 
@@ -69,13 +71,13 @@ class PersonControllerIntegrationTest {
         Person person = Person.builder()
                 .firstName(Const.PERSON_NAME)
                 .middleName(Const.PERSON_MIDDLE_NAME)
-                .lastName(Const.PERSON_SURNAME)
-                .dayOfBirth("23-07-1990")
+//                .lastName(Const.PERSON_SURNAME)
+                .dateOfBirth(new Date())
                 .build();
         ResponseEntity<String> response = restTemplate.postForEntity(URL, person, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Invalid date format: 23-07-1990. Accepted format: yyyy-MM-dd", response.getBody());
+        //assertEquals("Invalid date format: 23-07-1990. Accepted format: yyyy-MM-dd", response.getBody());
     }
 
     @Test
@@ -89,8 +91,8 @@ class PersonControllerIntegrationTest {
 
     @Test
     public void updatePersonSuccess() {
-        Person updateData = Person.builder().firstName(Const.PERSON_NAME).build();
-        restTemplate.put(URL + "/" + ID_UPDATE, updateData, Person.class);
+
+        restTemplate.put(URL + "/" + ID_UPDATE, person, Person.class);
 
         ResponseEntity<Person> response = restTemplate.getForEntity(URL + "/" + ID_UPDATE, Person.class);
         assertNotNull(response.getBody());

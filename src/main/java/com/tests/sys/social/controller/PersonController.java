@@ -1,14 +1,13 @@
 package com.tests.sys.social.controller;
 
-import com.tests.sys.social.Validator;
 import com.tests.sys.social.entity.Person;
-import com.tests.sys.social.exception.DateFormatException;
 import com.tests.sys.social.exception.PersonNotFoundException;
+import com.tests.sys.social.exception.PersonValidationException;
 import com.tests.sys.social.repository.PersonRepository;
 import com.tests.sys.social.repository.RelationshipRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-
-import static com.tests.sys.social.Const.DATE_FORMAT;
 
 @RestController
 @Slf4j
@@ -53,15 +48,21 @@ public class PersonController {
         return relationshipRepository.findFollowersById(id);
     }
 
-    @PostMapping
-    public Person createPerson(@RequestBody Person person) throws DateFormatException{
-        String dateOfBirth = person.getDayOfBirth();
-
-        if(Validator.isValidDateFormat(dateOfBirth)) {
-            throw new DateFormatException(dateOfBirth);
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Person createPerson(@RequestBody Person person) throws PersonValidationException {
+        log.debug("Request:" + person);
+        try {
+            person = personRepository.save(person);
+        } catch (Exception e) {
+            throw new PersonValidationException(person);
         }
+//        String dateOfBirth = person.getDayOfBirth();
+//
+//        if (Validator.isValidDateFormat(dateOfBirth)) {
+//            throw new DateFormatException(dateOfBirth);
+//        }
+        return person;
 
-        return personRepository.save(person);
     }
 
     @GetMapping("/{id}")
@@ -74,28 +75,17 @@ public class PersonController {
         return personRepository.findById(id)
                 .map(person -> {
 
-                    if(StringUtils.isNotEmpty(newPerson.getFirstName())) {
-                        person.setFirstName(newPerson.getFirstName());
-                    }
+                    person.setFirstName(newPerson.getFirstName());
+                    person.setLastName(newPerson.getLastName());
+                    person.setMiddleName(newPerson.getMiddleName());
+//                    String dateOfBirth = newPerson.getDayOfBirth();
+//
+//                    if (Validator.isValidDateFormat(dateOfBirth)) {
+//                        throw new DateFormatException(dateOfBirth);
+//                    }
 
-                    if(StringUtils.isNotEmpty(newPerson.getLastName())) {
-                        person.setLastName(newPerson.getLastName());
-                    }
+                    person.setDateOfBirth(newPerson.getDateOfBirth());
 
-                    if(StringUtils.isNotEmpty(newPerson.getMiddleName())) {
-                        person.setMiddleName(newPerson.getMiddleName());
-                    }
-
-
-                    if(StringUtils.isNotEmpty(newPerson.getDayOfBirth())) {
-                        String dateOfBirth = newPerson.getDayOfBirth();
-
-                        if (Validator.isValidDateFormat(dateOfBirth)) {
-                            throw new DateFormatException(dateOfBirth);
-                        }
-
-                        person.setDayOfBirth(dateOfBirth);
-                    }
                     return personRepository.save(person);
                 }).orElseGet(() -> {
                     newPerson.setId(id);

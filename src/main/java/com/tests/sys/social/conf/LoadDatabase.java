@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 
 @Configuration
 @Slf4j
@@ -26,13 +27,13 @@ public class LoadDatabase {
                     "Abramov",
                     "Alexey",
                     "Konstantinovich",
-                    "1985-02-03");
+                    new Date());
             Person p2 = new Person(
                     2L,
                     "Kravcov",
                     "Maksim",
                     "Evgenivich",
-                    "1983-03-30");
+                    new Date());
             log.info("Preloading " + repository.save(p1));
             log.info("Preloading " + repository.save(p2));
 
@@ -47,7 +48,7 @@ public class LoadDatabase {
                     "Temnokov",
                     "Alexey",
                     "Konstantinovich",
-                    "1985-04-09");
+                    new Date());
             log.info("Preloading " + repository.save(p3));
         };
     }
