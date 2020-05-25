@@ -29,11 +29,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Person createPerson(Person person) {
-        try {
-            return personRepository.save(person);
-        } catch (Exception e) {
-            throw new PersonValidationException(person);
-        }
+        return personRepository.save(person);
     }
 
     @Override
