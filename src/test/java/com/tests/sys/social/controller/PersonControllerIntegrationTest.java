@@ -14,8 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 
+import static com.tests.sys.social.utils.Const.PERSON_MIDDLE_NAME;
+import static com.tests.sys.social.utils.Const.PERSON_NAME;
+import static com.tests.sys.social.utils.Const.PERSON_SURNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -31,12 +35,10 @@ class PersonControllerIntegrationTest {
 
     private static final String ID_UPDATE = "1";
 
-    private Person person = Person.builder()
-            .firstName(Const.PERSON_NAME)
-            .middleName(Const.PERSON_MIDDLE_NAME)
-            .lastName(Const.PERSON_SURNAME)
-            .dateOfBirth(new Date())
-            .build();
+    private final Person person = new Person(PERSON_SURNAME,
+            PERSON_NAME,
+            PERSON_MIDDLE_NAME,
+            new Date());
 
 
     @Autowired
@@ -68,13 +70,11 @@ class PersonControllerIntegrationTest {
 
     @Test
     public void createNewPersonFailed() {
-        Person person = Person.builder()
-                .firstName(Const.PERSON_NAME)
-                .middleName(Const.PERSON_MIDDLE_NAME)
-//                .lastName(Const.PERSON_SURNAME)
-                .dateOfBirth(new Date())
-                .build();
-        ResponseEntity<String> response = restTemplate.postForEntity(URL, person, String.class);
+        Person p = new Person(null,
+                PERSON_NAME,
+                PERSON_MIDDLE_NAME,
+                new Date());
+        ResponseEntity<String> response = restTemplate.postForEntity(URL, p, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         //assertEquals("Invalid date format: 23-07-1990. Accepted format: yyyy-MM-dd", response.getBody());
@@ -100,7 +100,8 @@ class PersonControllerIntegrationTest {
     }
 
     @Test
-    public void successDeletePersonWithoutRelationship() {
+    @Transactional
+    public void successDeletePersonWithRelationship() {
         restTemplate.delete(URL + "/3");
 
         ResponseEntity<?> response = restTemplate.getForEntity(URL + "/3", String.class);

@@ -1,10 +1,8 @@
 package com.tests.sys.social.controller;
 
 import com.tests.sys.social.entity.Person;
-import com.tests.sys.social.exception.PersonNotFoundException;
 import com.tests.sys.social.exception.PersonValidationException;
-import com.tests.sys.social.repository.PersonRepository;
-import com.tests.sys.social.repository.RelationshipRepository;
+import com.tests.sys.social.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,77 +22,45 @@ import java.util.List;
 @RequestMapping("persons")
 public class PersonController {
 
-    private PersonRepository personRepository;
-    private RelationshipRepository relationshipRepository;
+    private PersonService personService;
 
     @Autowired
-    public PersonController(PersonRepository personRepository, RelationshipRepository relationshipRepository) {
-        this.personRepository = personRepository;
-        this.relationshipRepository = relationshipRepository;
+    public PersonController(PersonService personService) {
+        this.personService = personService;
     }
 
     @GetMapping
     public List<Person> getPersons() {
-        return personRepository.findAll();
+        return personService.getPersons();
     }
 
-    @GetMapping("/{id}/friends")
-    public List<Person> getFriends(@PathVariable Long id) {
-        return relationshipRepository.findFriendsById(id);
-    }
-
-    @GetMapping("/{id}/followers")
-    public List<Person> getFollowers(@PathVariable Long id) {
-        return relationshipRepository.findFollowersById(id);
-    }
+//    @GetMapping("/{id}/friends")
+//    public List<Person> getFriends(@PathVariable Long id) {
+//        return relationshipRepository.findFriendsById(id);
+//    }
+//
+//    @GetMapping("/{id}/followers")
+//    public List<Person> getFollowers(@PathVariable Long id) {
+//        return relationshipRepository.findFollowersById(id);
+//    }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Person createPerson(@RequestBody Person person) throws PersonValidationException {
-        log.debug("Request:" + person);
-        try {
-            person = personRepository.save(person);
-        } catch (Exception e) {
-            throw new PersonValidationException(person);
-        }
-//        String dateOfBirth = person.getDayOfBirth();
-//
-//        if (Validator.isValidDateFormat(dateOfBirth)) {
-//            throw new DateFormatException(dateOfBirth);
-//        }
-        return person;
-
+    public Person createPerson(@RequestBody Person person) {
+        return personService.createPerson(person);
     }
 
     @GetMapping("/{id}")
     public Person getPerson(@PathVariable Long id) {
-        return personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+        return personService.getPerson(id);
     }
 
     @PutMapping("/{id}")
     public Person updatePerson(@RequestBody Person newPerson, @PathVariable Long id) {
-        return personRepository.findById(id)
-                .map(person -> {
-
-                    person.setFirstName(newPerson.getFirstName());
-                    person.setLastName(newPerson.getLastName());
-                    person.setMiddleName(newPerson.getMiddleName());
-//                    String dateOfBirth = newPerson.getDayOfBirth();
-//
-//                    if (Validator.isValidDateFormat(dateOfBirth)) {
-//                        throw new DateFormatException(dateOfBirth);
-//                    }
-
-                    person.setDateOfBirth(newPerson.getDateOfBirth());
-
-                    return personRepository.save(person);
-                }).orElseGet(() -> {
-                    newPerson.setId(id);
-                    return personRepository.save(newPerson);
-                });
+        return personService.updatePerson(newPerson, id);
     }
 
     @DeleteMapping("/{id}")
     public void removePerson(@PathVariable Long id) {
-        personRepository.deleteById(id);
+        personService.deletePerson(id);
     }
 }
