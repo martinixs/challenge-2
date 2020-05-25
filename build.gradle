@@ -25,18 +25,21 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	compile 'junit:junit:4.12'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
 	testImplementation 'io.rest-assured:rest-assured:4.3.0'
 	testImplementation 'io.rest-assured:json-path:4.3.0'
 	testImplementation 'io.rest-assured:xml-path:4.3.0'
 	testImplementation 'io.rest-assured:spring-mock-mvc:4.3.0'
 	testImplementation 'io.rest-assured:spring-web-test-client:4.3.0'
 	testImplementation 'org.hamcrest:hamcrest:2.2'
-	testCompile 'junit:junit:4.12'
-	compile 'junit:junit:4.12'
-	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+
+	testCompile 'junit:junit:4.12'
 }
 
 test {

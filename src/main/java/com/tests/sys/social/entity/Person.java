@@ -2,6 +2,7 @@ package com.tests.sys.social.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -37,6 +39,7 @@ import java.util.Set;
 
 
 @Entity
+@JsonIgnoreProperties({"relationship", "friends"})
 public class Person {
 
     @Id
@@ -69,24 +72,22 @@ public class Person {
     private Date dateOfBirth;
 
 
+
     @Getter
     @Setter
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "RELATIONSHIP",
             joinColumns = {@JoinColumn(name = "PERSON_ID")},
             inverseJoinColumns = {@JoinColumn(name = "FRIEND_ID")})
-    private Set<Person> relationship = new HashSet<>();
+    private Set<Person> relationship;
+
 
 
     @Getter
     @Setter
     @ManyToMany(mappedBy = "relationship")
-    private Set<Person> friends = new HashSet<>();
+    private Set<Person> friends;
 
-
-    @PreRemove
-    private void removeFriend() {
-    }
 
     public Person() {
     }
