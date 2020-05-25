@@ -65,7 +65,7 @@ class PersonControllerIntegrationTest {
         ResponseEntity<?> response = restTemplate.getForEntity(URL + "/100", String.class);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Can't find person with id:100", response.getBody());
+        assertEquals("Can't find person with id: 100", response.getBody());
     }
 
     @Test
@@ -77,7 +77,7 @@ class PersonControllerIntegrationTest {
         ResponseEntity<String> response = restTemplate.postForEntity(URL, p, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        //assertEquals("Invalid date format: 23-07-1990. Accepted format: yyyy-MM-dd", response.getBody());
+        assertTrue(response.getBody().contains("Last Name can't be null"));
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.tests.sys.social.controller;
 
 import com.tests.sys.social.entity.Person;
-import com.tests.sys.social.exception.PersonValidationException;
 import com.tests.sys.social.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -45,7 +45,7 @@ public class PersonController {
 //    }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Person createPerson(@RequestBody Person person) {
+    public Person createPerson(@Valid @RequestBody Person person) {
         return personService.createPerson(person);
     }
 

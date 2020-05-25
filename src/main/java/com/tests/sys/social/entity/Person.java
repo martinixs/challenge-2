@@ -20,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.HashSet;
@@ -51,11 +52,13 @@ public class Person {
 
     @Getter
     @Setter
+    @NotNull(message = "Last Name can't be null")
     @Column(name = "LAST_NAME", nullable = false)
     private String lastName;
 
     @Getter
     @Setter
+    @NotNull(message = "First Name can't be null")
     @Column(name = "FIRST_NAME", nullable = false)
     private String firstName;
 
@@ -66,6 +69,7 @@ public class Person {
 
     @Getter
     @Setter
+    @NotNull(message = "Date of birth can't be null")
     @Column(name = "DATE_OF_BIRTH", nullable = false)
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")

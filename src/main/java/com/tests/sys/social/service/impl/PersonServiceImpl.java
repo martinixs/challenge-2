@@ -2,14 +2,12 @@ package com.tests.sys.social.service.impl;
 
 import com.tests.sys.social.entity.Person;
 import com.tests.sys.social.exception.PersonNotFoundException;
-import com.tests.sys.social.exception.PersonValidationException;
 import com.tests.sys.social.repository.PersonRepository;
 import com.tests.sys.social.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @Service
@@ -24,19 +22,19 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Person getPerson(Long id) {
         return personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
     }
 
     @Override
-    public Person createPerson(Person person) throws PersonValidationException{
+    public Person createPerson(Person person) {
         try {
             return personRepository.save(person);
         } catch (Exception e) {
             throw new PersonValidationException(person);
         }
     }
-
 
     @Override
     public Person updatePerson(Person newPerson, Long id) {
@@ -74,6 +72,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Person> getPersons() {
         return personRepository.findAll();
     }
