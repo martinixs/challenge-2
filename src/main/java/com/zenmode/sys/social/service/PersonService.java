@@ -10,5 +10,10 @@ public interface PersonService {
     Person updatePerson(Person newPerson, Long id);
     void deletePerson(Long id);
     List<Person> getPersons();
+
     List<Person> friends(Long id);
+    List<Person> addFriend(Long id, Person person);
+    List<Person> addFriend(Long id, Long friendId);
+    void deleteFriend(Long id, Long friendId);
+    void deleteFriend(Long id);
 }

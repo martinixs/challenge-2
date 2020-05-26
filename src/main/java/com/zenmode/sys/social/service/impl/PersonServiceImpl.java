@@ -63,7 +63,6 @@ public class PersonServiceImpl implements PersonService {
                 friend.getFriends().remove(person);
                 friend.getFollowers().remove(person);
             }
-            person.getFollowers().clear();
         }
 
         personRepository.delete(person);
@@ -75,11 +74,65 @@ public class PersonServiceImpl implements PersonService {
         return personRepository.findAll();
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public List<Person> friends(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
-
-        Set<Person> friends = person.getFriends();
-
-        return new ArrayList<>(friends);
+        return new ArrayList<>(person.getFriends());
     }
+
+    @Override
+    public List<Person> addFriend(Long id, Person person) {
+        Person friend = personRepository.save(person);
+        Person user = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+
+        user.getFriends().add(friend);
+        personRepository.save(user);
+
+        return new ArrayList<>(user.getFriends());
+    }
+
+    @Override
+    public List<Person> addFriend(Long id, Long friendId) {
+        Person friend = personRepository.findById(friendId).orElseThrow(() -> new PersonNotFoundException(id));
+        Person user = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+
+        user.getFriends().add(friend);
+        personRepository.save(user);
+
+        return new ArrayList<>(user.getFriends());
+    }
+
+    @Override
+    public void deleteFriend(Long id, Long friendId) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+        Person friend = personRepository.findById(friendId).orElseThrow(() -> new PersonNotFoundException(id));
+
+        person.getFriends().remove(friend);
+        person.getFollowers().remove(friend);
+
+        friend.getFriends().remove(person);
+        friend.getFollowers().remove(person);
+
+        personRepository.save(person);
+        personRepository.save(friend);
+    }
+
+    @Override
+    public void deleteFriend(Long id) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+        person.getFriends().clear();
+
+        if (!person.getFollowers().isEmpty()) {
+            for (Person friend : person.getFollowers()) {
+                friend.getFriends().remove(person);
+                friend.getFollowers().remove(person);
+            }
+        }
+
+        personRepository.save(person);
+
+    }
+
+
 }

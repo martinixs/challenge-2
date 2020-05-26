@@ -38,9 +38,9 @@ public class LoadDatabase {
                     new Date());
 
             Person p4 = new Person(
-                    "Temnokov",
-                    "Alexey",
-                    "Konstantinovich",
+                    "Astahov",
+                    "Dmitriy",
+                    "Valerievich",
                     new Date());
 
             log.info("Preloading " + repository.save(p1));
@@ -53,10 +53,12 @@ public class LoadDatabase {
             relationship.add(p3);
             p1.setFriends(relationship);
 
+
             log.info("Update " + repository.save(p1));
 
             Set<Person> relForPerson2= new HashSet<>();
             relForPerson2.add(p4);
+            //relForPerson2.add(p1);
             p2.setFriends(relForPerson2);
             log.info("Update " + repository.save(p2));
 
