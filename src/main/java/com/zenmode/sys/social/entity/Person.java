@@ -14,10 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -65,30 +64,28 @@ public class Person {
     @Setter
     @NotNull(message = "Date of birth can't be null")
     @Column(name = "DATE_OF_BIRTH", nullable = false)
-    @Temporal(TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date dateOfBirth;
-
+    private LocalDate dateOfBirth;
 
 
     @Getter
     @Setter
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "RELATIONSHIP",
-            joinColumns = {@JoinColumn(name = "PERSON_ID")},
-            inverseJoinColumns = {@JoinColumn(name = "FRIEND_ID")})
-    private Set<Person> friends;
+            joinColumns = {@JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "FRIEND_ID", referencedColumnName = "PERSON_ID")})
+    private Set<Person> friends = new HashSet<>();
 
     @Getter
     @Setter
     @ManyToMany(mappedBy = "friends")
-    private Set<Person> followers;
+    private Set<Person> followers = new HashSet<>();
 
 
     public Person() {
     }
 
-    public Person(String lastName, String firstName, String middleName, Date dateOfBirth) {
+    public Person(String lastName, String firstName, String middleName, LocalDate dateOfBirth) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.middleName = middleName;

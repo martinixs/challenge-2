@@ -7,61 +7,38 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.Month;
 
 @Configuration
 @Slf4j
 public class LoadDatabase {
 
+    private static final String PERSON1 = "Test1";
+    private static final String PERSON2 = "Test2";
+    private static final String PERSON3 = "Test3";
+    private static final String PERSON4 = "Test4";
 
     @Bean
-    @Transactional
     CommandLineRunner initDatabase(PersonRepository repository) {
         return args -> {
-            Person p1 = new Person("Abramov",
-                    "Alexey",
-                    "Konstantinovich",
-                    new Date());
-            Person p2 = new Person(
-                    "Kravcov",
-                    "Maksim",
-                    "Evgenivich",
-                    new Date());
+            Person p1 = new Person(PERSON1, PERSON1, PERSON1, LocalDate.of(1967, Month.DECEMBER, 15));
+            Person p2 = new Person(PERSON2, PERSON2, PERSON2, LocalDate.of(1973, Month.JULY, 25));
+            Person p3 = new Person(PERSON3, PERSON3, PERSON3, LocalDate.of(1989, Month.OCTOBER, 4));
+            Person p4 = new Person(PERSON4, PERSON4, PERSON4, LocalDate.of(1993, Month.FEBRUARY, 1));
 
-            Person p3 = new Person(
-                    "Temnokov",
-                    "Alexey",
-                    "Konstantinovich",
-                    new Date());
-
-            Person p4 = new Person(
-                    "Astahov",
-                    "Dmitriy",
-                    "Valerievich",
-                    new Date());
 
             log.info("Preloading " + repository.save(p1));
             log.info("Preloading " + repository.save(p2));
             log.info("Preloading " + repository.save(p3));
             log.info("Preloading " + repository.save(p4));
 
-            Set<Person> relationship = new HashSet<>();
-            relationship.add(p2);
-            relationship.add(p3);
-            p1.setFriends(relationship);
+            p1.getFriends().add(p2);
+            p1.getFriends().add(p3);
+            log.info("Update " + repository.saveAndFlush(p1));
 
-
-            log.info("Update " + repository.save(p1));
-
-            Set<Person> relForPerson2= new HashSet<>();
-            relForPerson2.add(p4);
-            //relForPerson2.add(p1);
-            p2.setFriends(relForPerson2);
-            log.info("Update " + repository.save(p2));
-
+            p2.getFriends().add(p4);
+            log.info("Update " + repository.saveAndFlush(p2));
         };
     }
 }

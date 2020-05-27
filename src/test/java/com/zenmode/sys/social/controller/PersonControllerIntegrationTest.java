@@ -15,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.Month;
 
 import static com.zenmode.sys.social.utils.Const.PERSON_MIDDLE_NAME;
 import static com.zenmode.sys.social.utils.Const.PERSON_NAME;
@@ -36,7 +36,7 @@ class PersonControllerIntegrationTest {
     private static final String URL_PERSON_1 = URL + "/1";
     private static final String URL_PERSON_1_FRIENDS = URL_PERSON_1 + "/friends";
 
-    private final Person person = new Person(PERSON_SURNAME, PERSON_NAME, PERSON_MIDDLE_NAME, new Date());
+    private final Person person = new Person(PERSON_SURNAME, PERSON_NAME, PERSON_MIDDLE_NAME, LocalDate.of(1967, Month.DECEMBER, 15));
 
 
     @Autowired
@@ -71,7 +71,7 @@ class PersonControllerIntegrationTest {
         Person p = new Person(null,
                 PERSON_NAME,
                 PERSON_MIDDLE_NAME,
-                new Date());
+                LocalDate.of(1967, Month.DECEMBER, 15));
         ResponseEntity<String> response = restTemplate.postForEntity(URL, p, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());

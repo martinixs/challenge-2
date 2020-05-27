@@ -1,7 +1,6 @@
 package com.zenmode.sys.social.dto;
 
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;

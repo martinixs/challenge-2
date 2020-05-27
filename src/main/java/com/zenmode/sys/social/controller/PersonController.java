@@ -23,7 +23,7 @@ public class PersonController {
     private static final String URL_PERSON_ID = "/persons/{id}";
     private static final String URL_PERSON_ID_FRIENDS = URL_PERSON_ID + "/friends";
 
-    private PersonService personService;
+    private final PersonService personService;
 
     @Autowired
     public PersonController(PersonService personService) {
@@ -72,11 +72,11 @@ public class PersonController {
 
     @DeleteMapping(URL_PERSON_ID_FRIENDS)
     public void deleteFriends(@PathVariable Long id) {
-        personService.deleteFriend(id);
+        personService.deleteAllFriends(id);
     }
 
     @DeleteMapping(URL_PERSON_ID_FRIENDS + "/{friendId}")
     public void deleteFriends(@PathVariable Long id, @PathVariable Long friendId) {
-        personService.deleteFriend(id, friendId);
+        personService.deleteAllFriends(id, friendId);
     }
 }

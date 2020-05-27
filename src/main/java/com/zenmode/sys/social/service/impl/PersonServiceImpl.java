@@ -4,19 +4,22 @@ import com.zenmode.sys.social.entity.Person;
 import com.zenmode.sys.social.exception.PersonNotFoundException;
 import com.zenmode.sys.social.repository.PersonRepository;
 import com.zenmode.sys.social.service.PersonService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @Transactional
 public class PersonServiceImpl implements PersonService {
 
-    private PersonRepository personRepository;
+    private final PersonRepository personRepository;
 
     @Autowired
     public PersonServiceImpl(PersonRepository personRepository) {
@@ -55,16 +58,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public void deletePerson(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
-
-        person.getFriends().clear();
-
-        if (!person.getFollowers().isEmpty()) {
-            for (Person friend : person.getFollowers()) {
-                friend.getFriends().remove(person);
-                friend.getFollowers().remove(person);
-            }
-        }
-
+        removeAllConnection(person);
         personRepository.delete(person);
     }
 
@@ -78,7 +72,7 @@ public class PersonServiceImpl implements PersonService {
     @Transactional(readOnly = true)
     public List<Person> friends(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
-        return new ArrayList<>(person.getFriends());
+        return getMutualConnection(person);
     }
 
     @Override
@@ -86,53 +80,65 @@ public class PersonServiceImpl implements PersonService {
         Person friend = personRepository.save(person);
         Person user = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
 
-        user.getFriends().add(friend);
-        personRepository.save(user);
-
-        return new ArrayList<>(user.getFriends());
+        return addFriend(user, friend);
     }
 
     @Override
     public List<Person> addFriend(Long id, Long friendId) {
-        Person friend = personRepository.findById(friendId).orElseThrow(() -> new PersonNotFoundException(id));
+        Person friend = personRepository.findById(friendId).orElseThrow(() -> new PersonNotFoundException(friendId));
         Person user = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
 
-        user.getFriends().add(friend);
-        personRepository.save(user);
-
-        return new ArrayList<>(user.getFriends());
+        return addFriend(user, friend);
     }
 
     @Override
-    public void deleteFriend(Long id, Long friendId) {
+    public void deleteAllFriends(Long id, Long friendId) {
         Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
-        Person friend = personRepository.findById(friendId).orElseThrow(() -> new PersonNotFoundException(id));
+        Person friend = personRepository.findById(friendId).orElseThrow(() -> new PersonNotFoundException(friendId));
 
-        person.getFriends().remove(friend);
-        person.getFollowers().remove(friend);
+        if (isFriend(person, friendId)) {
+            person.getFriends().remove(friend);
+            personRepository.save(person);
 
-        friend.getFriends().remove(person);
-        friend.getFollowers().remove(person);
-
-        personRepository.save(person);
-        personRepository.save(friend);
+            friend.getFriends().remove(person);
+            personRepository.save(friend);
+        }
     }
 
     @Override
-    public void deleteFriend(Long id) {
+    public void deleteAllFriends(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+
+        removeAllConnection(person);
         person.getFriends().clear();
 
-        if (!person.getFollowers().isEmpty()) {
-            for (Person friend : person.getFollowers()) {
-                friend.getFriends().remove(person);
-                friend.getFollowers().remove(person);
-            }
-        }
-
         personRepository.save(person);
-
     }
 
+    private List<Person> addFriend(Person user, Person friend) {
 
+        user.getFriends().add(friend);
+        friend.getFollowers().add(user);
+        personRepository.save(user);
+
+        friend.getFriends().add(user);
+        user.getFollowers().add(friend);
+        personRepository.save(friend);
+
+        return getMutualConnection(user);
+    }
+
+    private List<Person> getMutualConnection(Person person) {
+        Set<Person> friends = new HashSet<>(person.getFriends());
+        friends.retainAll(person.getFollowers());
+        return new ArrayList<>(friends);
+    }
+
+    private boolean isFriend(Person person, Long friendId) {
+        return getMutualConnection(person).stream().anyMatch(p -> p.getId().equals(friendId));
+    }
+
+    private void removeAllConnection(Person person) {
+        person.getFollowers().forEach(p -> p.getFriends().remove(person));
+    }
 }

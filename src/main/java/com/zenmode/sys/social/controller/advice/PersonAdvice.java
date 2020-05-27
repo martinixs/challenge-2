@@ -33,7 +33,7 @@ public class PersonAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String  constraintViolationException(ConstraintViolationException ex)  {
+    public String constraintViolationException(ConstraintViolationException ex) {
         return ex.getMessage();
     }
 
