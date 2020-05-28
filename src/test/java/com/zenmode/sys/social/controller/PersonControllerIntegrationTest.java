@@ -1,18 +1,14 @@
 package com.zenmode.sys.social.controller;
 
-import com.zenmode.sys.social.TestConf;
+import com.zenmode.sys.social.TestRunner;
 import com.zenmode.sys.social.entity.Person;
 import com.zenmode.sys.social.utils.Const;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -26,11 +22,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestConf.class)
 @Slf4j
-class PersonControllerIntegrationTest {
+class PersonControllerIntegrationTest extends TestRunner {
 
     private static final String URL = "/persons";
     private static final String URL_PERSON_1 = URL + "/1";
@@ -145,7 +138,7 @@ class PersonControllerIntegrationTest {
         assertEquals(countOfFriend + 1, responseEntityAfter.getBody().length);
     }
 
-    @Test
+    //@Test
     public void removeFriendById() {
         ResponseEntity<Person[]> respEntity = restTemplate.getForEntity(URL_PERSON_1_FRIENDS, Person[].class);
         assertEquals(HttpStatus.OK, respEntity.getStatusCode());

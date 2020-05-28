@@ -2,7 +2,9 @@ package com.zenmode.sys.social.controller;
 
 import com.zenmode.sys.social.entity.Person;
 import com.zenmode.sys.social.service.PersonService;
+import com.zenmode.sys.social.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,29 +13,42 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+
 @Slf4j
+@RestController
 public class PersonController {
 
     private static final String URL_PERSON_ID = "/persons/{id}";
     private static final String URL_PERSON_ID_FRIENDS = URL_PERSON_ID + "/friends";
 
     private final PersonService personService;
+    private final SearchService searchService;
 
     @Autowired
-    public PersonController(PersonService personService) {
+    public PersonController(PersonService personService, SearchService searchService) {
         this.personService = personService;
+        this.searchService = searchService;
     }
 
     @GetMapping("/persons")
-    public List<Person> getPersons() {
-        return personService.getPersons();
+    public List<Person> search(@RequestParam(value = "search", required = false) String search) {
+        if (StringUtils.isNotEmpty(search)) {
+            return searchService.findBySpec(search);
+        } else {
+            return personService.getPersons();
+        }
     }
+
+//    @GetMapping("/persons")
+//    public List<Person> getPersons() {
+//        return personService.getPersons();
+//    }
 
     @PostMapping(path = "/persons", produces = MediaType.APPLICATION_JSON_VALUE)
     public Person createPerson(@Valid @RequestBody Person person) {
